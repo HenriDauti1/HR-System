@@ -4,7 +4,7 @@ import { DataTable, type Column } from '@/components/common/DataTable';
 import { PageLoader } from '@/components/common/LoadingSpinner';
 import { mockDataService } from '@/services/mockDataService';
 import type { DepartmentStatisticsDto } from '@/types';
-import { Building2, Users, TrendingUp } from 'lucide-react';
+import { Building2, Users, TrendingUp, Sparkles } from 'lucide-react';
 
 const DepartmentStatistics: React.FC = () => {
   const [data, setData] = useState<DepartmentStatisticsDto[]>([]);
@@ -28,13 +28,16 @@ const DepartmentStatistics: React.FC = () => {
       header: 'Department',
       sortable: true,
       accessor: row => (
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-primary" />
+        <div className="flex items-center gap-3 group">
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary/20 blur-lg rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center shadow-md ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-4 group-hover:scale-105">
+              <Building2 className="w-6 h-6 text-white" />
+            </div>
           </div>
           <div>
-            <p className="font-medium">{row.departmentName}</p>
-            <p className="text-xs text-muted-foreground">{row.countryName}</p>
+            <p className="font-semibold text-foreground group-hover:text-primary transition-colors">{row.departmentName}</p>
+            <p className="text-xs text-muted-foreground font-medium">{row.countryName}</p>
           </div>
         </div>
       ),
@@ -43,16 +46,22 @@ const DepartmentStatistics: React.FC = () => {
       key: 'regionName',
       header: 'Region',
       sortable: true,
-      accessor: row => row.regionName,
+      accessor: row => (
+        <div className="px-3 py-1.5 rounded-lg bg-gradient-hero border border-border/30 inline-block">
+          <span className="font-semibold text-foreground">{row.regionName}</span>
+        </div>
+      ),
     },
     {
       key: 'totalEmployees',
       header: 'Total Employees',
       sortable: true,
       accessor: row => (
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-muted-foreground" />
-          <span className="font-semibold">{row.totalEmployees}</span>
+        <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Users className="w-4 h-4 text-primary" />
+          </div>
+          <span className="font-bold text-lg text-primary">{row.totalEmployees}</span>
         </div>
       ),
     },
@@ -60,18 +69,18 @@ const DepartmentStatistics: React.FC = () => {
       key: 'maleCount',
       header: 'Gender Distribution',
       accessor: row => (
-        <div className="space-y-1">
+        <div className="space-y-2 min-w-[200px]">
           <div className="flex items-center gap-2">
-            <div className="w-full max-w-32 bg-muted rounded-full h-2 overflow-hidden">
+            <div className="flex-1 bg-muted/50 rounded-full h-2.5 overflow-hidden border border-border/30">
               <div
-                className="h-full bg-primary rounded-full"
+                className="h-full bg-gradient-primary rounded-full shadow-sm transition-all duration-500"
                 style={{ width: `${row.malePercentage}%` }}
               />
             </div>
           </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Male: {row.maleCount} ({row.malePercentage}%)</span>
-            <span>Female: {row.femaleCount} ({row.femalePercentage}%)</span>
+          <div className="flex justify-between text-xs font-semibold">
+            <span className="text-primary">♂ {row.maleCount} ({row.malePercentage}%)</span>
+            <span className="text-accent">♀ {row.femaleCount} ({row.femalePercentage}%)</span>
           </div>
         </div>
       ),
@@ -81,9 +90,11 @@ const DepartmentStatistics: React.FC = () => {
       header: 'Avg. Service',
       sortable: true,
       accessor: row => (
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-success" />
-          <span>{row.avgYearsService} years</span>
+        <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-success/5 border border-success/10">
+          <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 text-success" />
+          </div>
+          <span className="font-bold text-success">{row.avgYearsService} years</span>
         </div>
       ),
     },
@@ -100,15 +111,25 @@ const DepartmentStatistics: React.FC = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Department Statistics</h1>
-            <p className="text-muted-foreground">
-              Overview of {data.length} departments across all regions
-            </p>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-hero border border-border/50 p-6 shadow-lg">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl" />
+          <div className="relative flex items-center gap-4">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-primary/30 blur-xl rounded-2xl animate-pulse" />
+              <div className="relative w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-lg group-hover:shadow-glow transition-all duration-300 group-hover:scale-110">
+                <Building2 className="w-7 h-7 text-white" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-3xl font-bold text-foreground">Department Statistics</h1>
+                <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+              </div>
+              <p className="text-muted-foreground font-medium">
+                Overview of <span className="text-primary font-bold text-lg">{data.length}</span> departments across all regions
+              </p>
+            </div>
           </div>
         </div>
 

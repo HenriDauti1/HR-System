@@ -43,6 +43,38 @@ const Login: React.FC = () => {
     }
   };
 
+  // Handler for demo account clicks
+  const handleDemoAccountClick = (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setError('');
+    toast({
+      title: 'Demo Account Selected',
+      description: 'Credentials have been filled. Click Sign In to continue.',
+    });
+  };
+
+  const demoAccounts = [
+    {
+      label: 'Admin',
+      email: 'admin@hrms.com',
+      password: 'admin123',
+      description: 'Full access to all features'
+    },
+    {
+      label: 'Read-Only',
+      email: 'coordinator@hrms.com',
+      password: 'coordinator123',
+      description: 'View-only access'
+    },
+    {
+      label: 'No Access',
+      email: 'developer@hrms.com',
+      password: 'developer123',
+      description: 'Restricted access'
+    }
+  ];
+
   return (
     <div className="min-h-screen flex bg-gradient-hero">
       {/* Left side - Branding */}
@@ -174,22 +206,48 @@ const Login: React.FC = () => {
               </Button>
             </form>
             
-            <div className="mt-8 pt-6 border-t border-border">
-              <p className="text-sm text-muted-foreground text-center mb-4">Demo Accounts:</p>
-              <div className="space-y-2 text-xs text-muted-foreground">
-                <div className="flex justify-between items-center p-2 rounded bg-muted/50">
-                  <span className="font-medium">Admin:</span>
-                  <span>admin@hrms.com / admin123</span>
-                </div>
-                <div className="flex justify-between items-center p-2 rounded bg-muted/50">
-                  <span className="font-medium">Read-Only:</span>
-                  <span>coordinator@hrms.com / coordinator123</span>
-                </div>
-                <div className="flex justify-between items-center p-2 rounded bg-muted/50">
-                  <span className="font-medium">No Access:</span>
-                  <span>developer@hrms.com / developer123</span>
-                </div>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate('/register')}
+                  className="text-primary font-semibold hover:underline"
+                >
+                  Register here
+                </button>
+              </p>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-border">
+              <p className="text-sm text-muted-foreground text-center mb-4">
+                Demo Accounts - Click to auto-fill:
+              </p>
+              <div className="space-y-2 text-xs">
+                {demoAccounts.map((account, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleDemoAccountClick(account.email, account.password)}
+                    className="w-full flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer group"
+                  >
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium text-foreground group-hover:text-primary transition-colors">
+                        {account.label}
+                      </span>
+                      <span className="text-muted-foreground text-[10px] mt-0.5">
+                        {account.description}
+                      </span>
+                    </div>
+                    <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                      {account.email.split('@')[0]}
+                    </span>
+                  </button>
+                ))}
               </div>
+              <p className="text-[10px] text-muted-foreground text-center mt-3">
+                Click any account above to fill credentials automatically
+              </p>
             </div>
           </div>
         </div>

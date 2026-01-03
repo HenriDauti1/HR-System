@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronUp, ChevronDown, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronUp, ChevronDown, Search, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -86,58 +86,66 @@ export function DataTable<T extends object>({
 
   const SortIcon = ({ columnKey }: { columnKey: string }) => {
     if (sortColumn !== columnKey) {
-      return <ChevronUp className="w-4 h-4 opacity-30" />;
+      return <ChevronUp className="w-4 h-4 opacity-30 transition-all" />;
     }
     return sortDirection === 'asc' ? (
-      <ChevronUp className="w-4 h-4 text-primary" />
+      <ChevronUp className="w-4 h-4 text-primary transition-all" />
     ) : (
-      <ChevronDown className="w-4 h-4 text-primary" />
+      <ChevronDown className="w-4 h-4 text-primary transition-all" />
     );
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       {/* Search */}
       {searchKeys.length > 0 && (
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder={searchPlaceholder}
-            value={search}
-            onChange={e => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="pl-10"
-          />
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1 max-w-md group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-all group-focus-within:text-primary" />
+            <Input
+              type="text"
+              placeholder={searchPlaceholder}
+              value={search}
+              onChange={e => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-10 h-11 bg-card/50 border-border/50 focus:bg-card transition-all shadow-sm hover:shadow-md"
+            />
+          </div>
+          {search && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground animate-slide-in">
+              <Filter className="w-4 h-4" />
+              <span className="font-medium">{filteredData.length} results</span>
+            </div>
+          )}
         </div>
       )}
 
       {/* Table */}
-      <div className="rounded-lg border border-border overflow-hidden bg-card">
+      <div className="rounded-xl border border-border/50 overflow-hidden bg-card shadow-md hover:shadow-lg transition-shadow duration-300">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-primary-light border-b border-border">
+              <tr className="bg-gradient-hero border-b border-border/50">
                 {columns.map(column => (
                   <th
                     key={column.key}
                     className={cn(
-                      'px-4 py-3 text-left text-sm font-semibold text-foreground',
-                      column.sortable && 'cursor-pointer select-none hover:bg-primary/5',
+                      'px-6 py-4 text-left text-sm font-semibold text-foreground',
+                      column.sortable && 'cursor-pointer select-none hover:bg-primary/5 transition-colors',
                       column.className
                     )}
                     onClick={() => column.sortable && handleSort(column.key)}
                   >
-                    <div className="flex items-center gap-2">
-                      {column.header}
+                    <div className="flex items-center gap-2 group">
+                      <span className="transition-colors group-hover:text-primary">{column.header}</span>
                       {column.sortable && <SortIcon columnKey={column.key} />}
                     </div>
                   </th>
                 ))}
                 {actions && (
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-foreground">
                     Actions
                   </th>
                 )}
@@ -148,9 +156,14 @@ export function DataTable<T extends object>({
                 <tr>
                   <td
                     colSpan={columns.length + (actions ? 1 : 0)}
-                    className="px-4 py-12 text-center text-muted-foreground"
+                    className="px-6 py-16 text-center"
                   >
-                    {emptyMessage}
+                    <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                      <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
+                        <Search className="w-8 h-8 opacity-50" />
+                      </div>
+                      <p className="text-sm font-medium">{emptyMessage}</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -158,22 +171,22 @@ export function DataTable<T extends object>({
                   <tr
                     key={idx}
                     className={cn(
-                      'border-b border-border last:border-0 transition-colors',
+                      'border-b border-border/30 last:border-0 transition-all duration-200',
                       onRowClick && 'cursor-pointer',
-                      'hover:bg-primary-light/50'
+                      'hover:bg-gradient-hero/50 hover:shadow-sm'
                     )}
                     onClick={() => onRowClick?.(row)}
                   >
                     {columns.map(column => (
                       <td
                         key={column.key}
-                        className={cn('px-4 py-3 text-sm text-foreground', column.className)}
+                        className={cn('px-6 py-4 text-sm text-foreground', column.className)}
                       >
                         {column.accessor(row)}
                       </td>
                     ))}
                     {actions && (
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-6 py-4 text-right">
                         <div onClick={e => e.stopPropagation()}>{actions(row)}</div>
                       </td>
                     )}
@@ -187,10 +200,11 @@ export function DataTable<T extends object>({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing {(currentPage - 1) * pageSize + 1} to{' '}
-            {Math.min(currentPage * pageSize, sortedData.length)} of {sortedData.length} entries
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
+          <p className="text-sm text-muted-foreground font-medium">
+            Showing <span className="font-semibold text-foreground">{(currentPage - 1) * pageSize + 1}</span> to{' '}
+            <span className="font-semibold text-foreground">{Math.min(currentPage * pageSize, sortedData.length)}</span> of{' '}
+            <span className="font-semibold text-foreground">{sortedData.length}</span> entries
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -198,6 +212,7 @@ export function DataTable<T extends object>({
               size="sm"
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
+              className="gap-1 font-medium hover:bg-primary/10 hover:text-primary hover:border-primary/50 transition-all shadow-sm"
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
@@ -220,7 +235,12 @@ export function DataTable<T extends object>({
                     variant={currentPage === page ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setCurrentPage(page)}
-                    className="w-9"
+                    className={cn(
+                      "w-10 font-medium transition-all shadow-sm",
+                      currentPage === page
+                        ? "bg-gradient-primary text-white shadow-md hover:shadow-lg"
+                        : "hover:bg-primary/10 hover:text-primary"
+                    )}
                   >
                     {page}
                   </Button>
@@ -232,6 +252,7 @@ export function DataTable<T extends object>({
               size="sm"
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
+              className="gap-1 font-medium hover:bg-primary/10 hover:text-primary hover:border-primary/50 transition-all shadow-sm"
             >
               Next
               <ChevronRight className="w-4 h-4" />

@@ -30,6 +30,7 @@ import AttendanceManagement from "@/pages/admin/AttendanceManagement";
 import ContractManagement from "@/pages/admin/ContractManagement";
 import PayrollManagement from "@/pages/admin/PayrollManagement";
 import LeaveManagement from "@/pages/admin/LeaveManagement";
+import Register from "./pages/Register";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/access-denied" element={<AccessDenied />} />
             
             {/* Protected routes */}

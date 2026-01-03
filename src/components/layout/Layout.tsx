@@ -20,6 +20,7 @@ import {
   Home,
   Settings,
   Shield,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -99,7 +100,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
           onClick={onClose}
         />
       )}
@@ -107,25 +108,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:sticky top-0 left-0 z-50 h-screen w-72 bg-gradient-sidebar flex flex-col transition-transform duration-300 lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed lg:sticky top-0 left-0 z-50 h-screen w-72 bg-gradient-sidebar flex flex-col transition-transform duration-300 lg:translate-x-0 border-r border-sidebar-border/50",
+          isOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"
         )}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-sidebar-border">
-          <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-sidebar-primary flex items-center justify-center shadow-lg">
-              <Shield className="w-6 h-6 text-sidebar-primary-foreground" />
+        <div className="flex items-center justify-between px-6 py-6 border-b border-sidebar-border/50">
+          <Link to="/dashboard" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-sidebar-primary/30 blur-xl rounded-full animate-pulse" />
+              <div className="relative w-11 h-11 rounded-xl bg-sidebar-primary flex items-center justify-center shadow-lg group-hover:shadow-glow transition-all duration-300 group-hover:scale-110">
+                <Shield className="w-6 h-6 text-sidebar-primary-foreground" />
+              </div>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-sidebar-foreground">HRMS</h1>
-              <p className="text-xs text-sidebar-foreground/60">Management System</p>
+              <h1 className="text-xl font-bold text-sidebar-foreground tracking-tight">HRMS</h1>
+              <p className="text-xs text-sidebar-foreground/60 font-medium">Management System</p>
             </div>
           </Link>
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent"
+            className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-all"
             onClick={onClose}
           >
             <X className="w-5 h-5" />
@@ -133,111 +137,127 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* User info */}
-        <div className="px-4 py-4 border-b border-sidebar-border">
-          <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-sidebar-primary/20 flex items-center justify-center">
-              <span className="text-sm font-semibold text-sidebar-primary">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
+        <div className="px-4 py-5 border-b border-sidebar-border/50">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-sidebar-primary/10 blur-lg rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl bg-sidebar-accent/30 border border-sidebar-border/30 transition-all duration-300 group-hover:bg-sidebar-accent/50">
+              <div className="relative">
+                <div className="w-11 h-11 rounded-full bg-gradient-primary flex items-center justify-center shadow-md ring-2 ring-sidebar-primary/30">
+                  <span className="text-sm font-bold text-white">
+                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  </span>
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-success rounded-full border-2 border-sidebar-background" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-sidebar-foreground truncate">
+                  {user?.firstName} {user?.lastName}
+                </p>
+                <p className="text-xs text-sidebar-foreground/60 truncate font-medium">
+                  {user?.positionName}
+                </p>
+              </div>
+              <span className={cn(
+                "px-2.5 py-1 text-xs font-semibold rounded-full shadow-sm",
+                isAdmin
+                  ? "bg-sidebar-primary/30 text-sidebar-primary ring-1 ring-sidebar-primary/40"
+                  : "bg-sidebar-accent text-sidebar-accent-foreground"
+              )}>
+                {user?.role}
               </span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">
-                {user?.positionName}
-              </p>
-            </div>
-            <span className={cn(
-              "px-2 py-0.5 text-xs font-medium rounded-full",
-              isAdmin
-                ? "bg-sidebar-primary/20 text-sidebar-primary"
-                : "bg-sidebar-accent text-sidebar-accent-foreground"
-            )}>
-              {user?.role}
-            </span>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3">
-          <ul className="space-y-1">
-            {filteredNavigation.map(item => (
-              <li key={item.label}>
-                {item.children ? (
-                  <div>
-                    <button
-                      onClick={() => toggleExpanded(item.label)}
-                      className={cn(
-                        "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                        isParentActive(item.children)
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                      )}
-                    >
-                      <span className="flex items-center gap-3">
-                        {item.icon}
-                        {item.label}
-                      </span>
-                      {expandedItems.includes(item.label) ? (
-                        <ChevronDown className="w-4 h-4" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4" />
-                      )}
-                    </button>
-                    {expandedItems.includes(item.label) && (
-                      <ul className="mt-1 ml-4 pl-4 border-l border-sidebar-border space-y-1">
-                        {item.children
-                          .filter(child => !child.adminOnly || isAdmin)
-                          .map(child => (
-                            <li key={child.label}>
-                              <Link
-                                to={child.href!}
-                                onClick={onClose}
-                                className={cn(
-                                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                                  isActive(child.href!)
-                                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                                )}
-                              >
-                                {child.icon}
-                                {child.label}
-                              </Link>
-                            </li>
-                          ))}
-                      </ul>
-                    )}
-                  </div>
-                ) : (
-                  <Link
-                    to={item.href!}
-                    onClick={onClose}
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+          {filteredNavigation.map(item => (
+            <div key={item.label} className="animate-slide-in">
+              {item.children ? (
+                <div>
+                  <button
+                    onClick={() => toggleExpanded(item.label)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
-                      isActive(item.href!)
-                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                      "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group",
+                      isParentActive(item.children)
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                         : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                     )}
                   >
+                    <span className="flex items-center gap-3">
+                      <span className="transition-transform duration-200 group-hover:scale-110">
+                        {item.icon}
+                      </span>
+                      {item.label}
+                    </span>
+                    {expandedItems.includes(item.label) ? (
+                      <ChevronDown className="w-4 h-4 transition-transform duration-200" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 transition-transform duration-200" />
+                    )}
+                  </button>
+                  {expandedItems.includes(item.label) && (
+                    <ul className="mt-1 ml-4 pl-4 border-l-2 border-sidebar-border/40 space-y-1 animate-slide-in">
+                      {item.children
+                        .filter(child => !child.adminOnly || isAdmin)
+                        .map(child => (
+                          <li key={child.label}>
+                            <Link
+                              to={child.href!}
+                              onClick={onClose}
+                              className={cn(
+                                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 group relative overflow-hidden",
+                                isActive(child.href!)
+                                  ? "bg-gradient-primary text-sidebar-primary-foreground shadow-md font-medium"
+                                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground font-normal"
+                              )}
+                            >
+                              {isActive(child.href!) && (
+                                <span className="absolute inset-0 bg-white/10 animate-pulse" />
+                              )}
+                              <span className="relative transition-transform duration-200 group-hover:scale-110">
+                                {child.icon}
+                              </span>
+                              <span className="relative">{child.label}</span>
+                            </Link>
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to={item.href!}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative overflow-hidden",
+                    isActive(item.href!)
+                      ? "bg-gradient-primary text-sidebar-primary-foreground shadow-md"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  )}
+                >
+                  {isActive(item.href!) && (
+                    <span className="absolute inset-0 bg-white/10 animate-pulse" />
+                  )}
+                  <span className="relative transition-transform duration-200 group-hover:scale-110">
                     {item.icon}
-                    {item.label}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
+                  </span>
+                  <span className="relative">{item.label}</span>
+                </Link>
+              )}
+            </div>
+          ))}
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t border-sidebar-border">
+        <div className="p-4 border-t border-sidebar-border/50">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+            className="w-full justify-start gap-3 text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 rounded-lg transition-all duration-200 group"
             onClick={handleLogout}
           >
-            <LogOut className="w-5 h-5" />
-            Sign Out
+            <LogOut className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+            <span className="font-medium">Sign Out</span>
           </Button>
         </div>
       </aside>
@@ -253,33 +273,39 @@ export const Topbar: React.FC<TopbarProps> = ({ onMenuClick }) => {
   const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-card border-b border-border flex items-center px-4 lg:px-6">
+    <header className="sticky top-0 z-30 h-16 bg-card/80 backdrop-blur-xl border-b border-border/50 flex items-center px-4 lg:px-6 shadow-sm">
       <Button
         variant="ghost"
         size="icon"
-        className="lg:hidden mr-2"
+        className="lg:hidden mr-2 hover:bg-primary/10 rounded-lg transition-all"
         onClick={onMenuClick}
       >
         <Menu className="w-5 h-5" />
       </Button>
 
       <div className="flex-1">
-        <h2 className="text-lg font-semibold text-foreground hidden sm:block">
-          Welcome back, {user?.firstName}!
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-bold text-foreground hidden sm:block bg-gradient-primary bg-clip-text text-transparent">
+            Welcome back, {user?.firstName}!
+          </h2>
+          <Sparkles className="w-4 h-4 text-primary animate-pulse hidden sm:block" />
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
         <div className="text-right hidden sm:block">
-          <p className="text-sm font-medium text-foreground">
+          <p className="text-sm font-semibold text-foreground">
             {user?.firstName} {user?.lastName}
           </p>
-          <p className="text-xs text-muted-foreground">{user?.email}</p>
+          <p className="text-xs text-muted-foreground font-medium">{user?.email}</p>
         </div>
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-          <span className="text-sm font-semibold text-primary">
-            {user?.firstName?.[0]}{user?.lastName?.[0]}
-          </span>
+        <div className="relative group">
+          <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative w-11 h-11 rounded-full bg-gradient-primary flex items-center justify-center shadow-md ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-4 group-hover:ring-primary/30 group-hover:scale-105">
+            <span className="text-sm font-bold text-white">
+              {user?.firstName?.[0]}{user?.lastName?.[0]}
+            </span>
+          </div>
         </div>
       </div>
     </header>
@@ -299,7 +325,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
-          {children}
+          <div className="animate-fade-in">
+            {children}
+          </div>
         </main>
       </div>
     </div>

@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
@@ -169,7 +169,7 @@ export function CrudPage<T extends object>({
             value={value as string || ''}
             onValueChange={(val) => setFormData({ ...formData, [field.name]: val })}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-11 bg-card/50 border-border/50 hover:border-primary/50 focus:border-primary transition-all shadow-sm">
               <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
             </SelectTrigger>
             <SelectContent>
@@ -183,10 +183,16 @@ export function CrudPage<T extends object>({
         );
       case 'switch':
         return (
-          <Switch
-            checked={value === true || value === 'true'}
-            onCheckedChange={(checked) => setFormData({ ...formData, [field.name]: checked })}
-          />
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+            <Switch
+              checked={value === true || value === 'true'}
+              onCheckedChange={(checked) => setFormData({ ...formData, [field.name]: checked })}
+              className="data-[state=checked]:bg-primary"
+            />
+            <span className="text-sm text-muted-foreground font-medium">
+              {value === true || value === 'true' ? 'Enabled' : 'Disabled'}
+            </span>
+          </div>
         );
       case 'textarea':
         return (
@@ -194,7 +200,7 @@ export function CrudPage<T extends object>({
             value={value as string || ''}
             onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
             placeholder={field.placeholder}
-            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex min-h-[100px] w-full rounded-lg border border-border/50 bg-card/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-all shadow-sm hover:shadow-md resize-none"
             required={field.required}
           />
         );
@@ -206,6 +212,7 @@ export function CrudPage<T extends object>({
             onChange={(e) => setFormData({ ...formData, [field.name]: parseFloat(e.target.value) || 0 })}
             placeholder={field.placeholder}
             required={field.required}
+            className="h-11 bg-card/50 border-border/50 hover:border-primary/50 focus:border-primary transition-all shadow-sm"
           />
         );
       case 'date':
@@ -215,6 +222,7 @@ export function CrudPage<T extends object>({
             value={value as string || ''}
             onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
             required={field.required}
+            className="h-11 bg-card/50 border-border/50 hover:border-primary/50 focus:border-primary transition-all shadow-sm"
           />
         );
       case 'datetime':
@@ -224,6 +232,7 @@ export function CrudPage<T extends object>({
             value={value ? String(value).slice(0, 16) : ''}
             onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
             required={field.required}
+            className="h-11 bg-card/50 border-border/50 hover:border-primary/50 focus:border-primary transition-all shadow-sm"
           />
         );
       default:
@@ -234,6 +243,7 @@ export function CrudPage<T extends object>({
             onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
             placeholder={field.placeholder}
             required={field.required}
+            className="h-11 bg-card/50 border-border/50 hover:border-primary/50 focus:border-primary transition-all shadow-sm"
           />
         );
     }
@@ -248,7 +258,7 @@ export function CrudPage<T extends object>({
           e.stopPropagation();
           handleOpenEdit(item);
         }}
-        className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+        className="h-9 w-9 p-0 text-primary hover:text-primary hover:bg-primary/10 rounded-lg transition-all shadow-sm hover:shadow-md"
       >
         <Pencil className="h-4 w-4" />
       </Button>
@@ -259,7 +269,7 @@ export function CrudPage<T extends object>({
           e.stopPropagation();
           handleOpenDelete((item as Record<string, unknown>)[idField as string] as string);
         }}
-        className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+        className="h-9 w-9 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all shadow-sm hover:shadow-md"
       >
         <Trash2 className="h-4 w-4" />
       </Button>
@@ -270,19 +280,28 @@ export function CrudPage<T extends object>({
     <Layout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">{title}</h1>
-            <p className="text-muted-foreground mt-1">{description}</p>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold text-foreground">{title}</h1>
+              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+            </div>
+            <p className="text-muted-foreground font-medium">{description}</p>
           </div>
-          <Button onClick={handleOpenCreate} className="gap-2">
-            <Plus className="h-4 w-4" />
+          <Button
+            onClick={handleOpenCreate}
+            className="gap-2 bg-gradient-primary text-white hover:shadow-glow transition-all duration-300 h-11 px-6 font-semibold shadow-md hover:scale-105"
+          >
+            <Plus className="h-5 w-5" />
             Add New
           </Button>
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <LoadingSpinner size="lg" />
+          <div className="flex justify-center py-16">
+            <div className="text-center space-y-4">
+              <LoadingSpinner size="lg" />
+              <p className="text-sm text-muted-foreground font-medium">Loading data...</p>
+            </div>
           </div>
         ) : (
           <DataTable
@@ -296,30 +315,46 @@ export function CrudPage<T extends object>({
 
         {/* Create/Edit Dialog */}
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-          <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
+          <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto bg-gradient-card border-border/50 shadow-xl">
+            <DialogHeader className="border-b border-border/50 pb-4">
+              <DialogTitle className="text-2xl font-bold text-foreground">
                 {editingItem ? `Edit ${title.slice(0, -1)}` : `Create ${title.slice(0, -1)}`}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-5 py-6">
                 {fields.map(field => (
-                  <div key={field.name} className="grid gap-2">
-                    <Label htmlFor={field.name} className="flex items-center gap-1">
+                  <div key={field.name} className="grid gap-2.5">
+                    <Label htmlFor={field.name} className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
                       {field.label}
-                      {field.required && <span className="text-destructive">*</span>}
+                      {field.required && <span className="text-destructive text-base">*</span>}
                     </Label>
                     {renderField(field)}
                   </div>
                 ))}
               </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
+              <DialogFooter className="border-t border-border/50 pt-4 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsFormOpen(false)}
+                  className="font-semibold hover:bg-muted transition-all shadow-sm"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSaving}>
-                  {isSaving ? <LoadingSpinner size="sm" /> : editingItem ? 'Update' : 'Create'}
+                <Button
+                  type="submit"
+                  disabled={isSaving}
+                  className="gap-2 bg-gradient-primary text-white hover:shadow-glow transition-all duration-300 font-semibold shadow-md hover:scale-105"
+                >
+                  {isSaving ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      Saving...
+                    </>
+                  ) : (
+                    editingItem ? 'Update' : 'Create'
+                  )}
                 </Button>
               </DialogFooter>
             </form>
@@ -328,20 +363,31 @@ export function CrudPage<T extends object>({
 
         {/* Delete Confirmation */}
         <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-          <AlertDialogContent>
+          <AlertDialogContent className="bg-gradient-card border-border/50 shadow-xl">
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete this {title.slice(0, -1).toLowerCase()}.
+              <AlertDialogTitle className="text-xl font-bold text-foreground">
+                Are you absolutely sure?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-muted-foreground font-medium">
+                This action cannot be undone. This will permanently delete this {title.slice(0, -1).toLowerCase()} from the system.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogFooter className="gap-2">
+              <AlertDialogCancel className="font-semibold hover:bg-muted transition-all shadow-sm">
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:shadow-lg transition-all font-semibold shadow-md"
               >
-                {isSaving ? <LoadingSpinner size="sm" /> : 'Delete'}
+                {isSaving ? (
+                  <>
+                    <LoadingSpinner size="sm" />
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
